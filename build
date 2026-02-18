@@ -1,0 +1,15 @@
+#! /bin/sh
+
+die() {
+    echo
+    echo "$@"
+    exit 1
+}
+
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+
+# Assume Rate mirrors is defined
+pacman -S --needed --noconfirm rate-mirrors
+
+rate-mirrors --allow-root --protocol=https --save "$BASEDIR/mirrorlist" arch
+rate-mirrors --allow-root --protocol=https --save "$BASEDIR/chaotic-mirrorlist" chaotic-aur
