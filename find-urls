@@ -1,0 +1,4 @@
+#! /bin/bash
+
+grep ^Server[[:blank:]]*=[[:blank:]]*https://[a-zA-Z0-9.]*/archlinux/\$repo/os/\$arch$ mirrorlists/arch | cut -d '/' -f 3
+ #| cut -d '/' -f 3
