@@ -9,7 +9,7 @@ die() {
 BASEDIR="$(dirname "$(readlink -f "$0")")"
 
 # Assume Rate mirrors is defined
-pacman -S --needed --noconfirm rate-mirrors
+sudo pacman -S --needed --noconfirm rate-mirrors
 
 [ -f "$BASEDIR/mirrorlist" ] || rate-mirrors --allow-root --protocol=https --save "$BASEDIR/mirrorlist" arch
 [ -f "$BASEDIR/chaotic-mirrorlist" ] || rate-mirrors --allow-root --protocol=https --save "$BASEDIR/chaotic-mirrorlist" chaotic-aur
