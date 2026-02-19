@@ -1,4 +1,68 @@
 #! /bin/bash
 
-grep ^Server[[:blank:]]*=[[:blank:]]*https://[a-zA-Z0-9.]*/archlinux/\$repo/os/\$arch$ mirrorlists/arch | cut -d '/' -f 3
- #| cut -d '/' -f 3
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+
+
+#arch_regex_pattern="^Server = https://([^/]+)/archlinux/\$repo/os/\$arch$"
+arch_regex_pattern="(https)"
+
+is_arch_url()
+{
+  url=$1
+  regex_pattern='^Server = https://([^/]+?)/archlinux/\$repo/os/\$arch$'
+
+  if [[ "$url" =~ $regex_pattern ]]; then
+      domain=${BASH_REMATCH[1]}
+      echo "$domain"
+  fi
+}
+
+is_chaotic_aur_url()
+{
+  url=$1
+  regex_pattern='^Server = https://([^/]+?)/\$repo/\$arch$'
+
+  if [[ "$url" =~ $regex_pattern ]]; then
+      domain=${BASH_REMATCH[1]}
+      echo "$domain"
+  fi
+}
+
+echo "$(is_arch_url 'Server = https://mirrors.tuna.tsinghua.edu.cn/archlinux/$repo/os/$arch')"
+echo "$(is_chaotic_aur_url 'Server = https://kr-mirror.chaotic.cx/$repo/$arch')"
+
+
+echo "Loading: Arch Mirrors"
+declare -a ARCH_MIRRORS=()
+while read -r line
+do
+  if [ -n "$line" ]; then
+    #echo "Check: '$line'"
+    match=$(is_arch_url "$line")
+    if [ -n "$match" ]; then
+      echo " * $match"
+      ARCH_MIRRORS+=("$match")
+      #((ARCH_MIRRORS++))
+    fi
+
+  fi
+done < "$BASEDIR/mirrorlists/arch"
+
+echo "Arch Mirrors: ${#ARCH_MIRRORS[@]}"
+echo ""
+echo "Chaotic AUR Mirrors"
+
+declare -a CHAOTIC_AUR_MIRRORS=()
+while read -r line
+do
+  if [ -n "$line" ]; then
+    #echo "Check: '$line'"
+    match=$(is_chaotic_aur_url "$line")
+    if [ -n "$match" ]; then
+      echo " * $match"
+      CHAOTIC_AUR_MIRRORS+=("$match")
+    fi
+  fi
+done < "$BASEDIR/mirrorlists/chaotic"
+
+echo "Chaotic AUR Mirrors: ${#CHAOTIC_AUR_MIRRORS[@]}"
